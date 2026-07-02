@@ -34,7 +34,8 @@ public class InRepairState implements CarState {
         TimeUnit.SECONDS.sleep(repairSeconds);
 
         log.info("Car-{} repair finished", car.getCarId());
-        return new RepairedState();
+        return new RepairingState();
+
 
     }
 
