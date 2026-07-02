@@ -1,8 +1,8 @@
 package com.innowise.multithreading.app;
 
-import com.innowise.multithreading.config.InitData;
-import com.innowise.multithreading.config.InitDataLoader;
-import com.innowise.multithreading.config.impl.InitDataLoaderImpl;
+import com.innowise.multithreading.parser.InitData;
+import com.innowise.multithreading.parser.InitDataParser;
+import com.innowise.multithreading.parser.impl.InitDataParserImpl;
 import com.innowise.multithreading.entity.Car;
 import com.innowise.multithreading.entity.CarSpecification;
 import com.innowise.multithreading.entity.RepairReport;
@@ -30,8 +30,8 @@ public class Main {
 
     void main(String[] args) {
         try {
-            InitDataLoader loader = new InitDataLoaderImpl();
-            InitData initData = loader.load("data/init_data.txt");
+            InitDataParser loader = new InitDataParserImpl();
+            InitData initData = loader.parse("data/init_data.txt");
 
             RepairBoxPool boxPool = new RepairBoxPool(initData.boxCount());
             Warehouse warehouse = new Warehouse(initData.initialStock());

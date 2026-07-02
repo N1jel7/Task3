@@ -1,10 +1,11 @@
-package com.innowise.arrays.reader;
+package com.innowise.multithreading.reader;
 
-import com.innowise.arrays.exception.CustomArrayException;
+import com.innowise.multithreading.exception.CustomAutoException;
 
 import java.util.List;
 
-public interface CustomArrayReader {
+public interface CustomTextReader {
 
-    List<String> readAllLinesFromFile(String path) throws CustomArrayException;
+    List<String> readAllLinesFromFile(String path) throws CustomAutoException;
+
 }

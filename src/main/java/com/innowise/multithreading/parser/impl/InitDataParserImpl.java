@@ -1,36 +1,33 @@
-package com.innowise.multithreading.config.impl;
+package com.innowise.multithreading.parser.impl;
 
-import com.innowise.multithreading.config.InitData;
-import com.innowise.multithreading.config.InitDataLoader;
 import com.innowise.multithreading.entity.CarSpecification;
 import com.innowise.multithreading.entity.PartType;
 import com.innowise.multithreading.exception.CustomAutoException;
+import com.innowise.multithreading.parser.InitData;
+import com.innowise.multithreading.parser.InitDataParser;
+import com.innowise.multithreading.reader.CustomTextReader;
+import com.innowise.multithreading.reader.CustomTextReaderImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-public class InitDataLoaderImpl implements InitDataLoader {
+public class InitDataParserImpl implements InitDataParser {
 
-    private static final Logger log = LogManager.getLogger(InitDataLoaderImpl.class);
+    private static final Logger log = LogManager.getLogger(InitDataParserImpl.class);
 
-    private enum Section { NONE, PARTS, RESTOCK, CARS }
+    private enum Section {NONE, PARTS, RESTOCK, CARS}
 
     @Override
-    public InitData load(String path) throws CustomAutoException {
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(Path.of(path));
-        } catch (IOException e) {
-            log.error("Failed to read initialization file: {}", path, e);
-            throw new CustomAutoException("Failed to read initialization file: " + path, e);
-        }
+    public InitData parse(String path) throws CustomAutoException {
+
+        CustomTextReader customTextReader = new CustomTextReaderImpl();
+
+        List<String> lines = customTextReader.readAllLinesFromFile(path);
 
         int boxCount = 0;
         int restockPeriodSeconds = 0;
@@ -48,9 +45,18 @@ public class InitDataLoaderImpl implements InitDataLoader {
             }
 
             switch (line) {
-                case "PARTS" -> { currentSection = Section.PARTS; continue; }
-                case "RESTOCK" -> { currentSection = Section.RESTOCK; continue; }
-                case "CARS" -> { currentSection = Section.CARS; continue; }
+                case "PARTS" -> {
+                    currentSection = Section.PARTS;
+                    continue;
+                }
+                case "RESTOCK" -> {
+                    currentSection = Section.RESTOCK;
+                    continue;
+                }
+                case "CARS" -> {
+                    currentSection = Section.CARS;
+                    continue;
+                }
                 default -> { /* Handling below (SECTION.NONE) */ }
             }
 

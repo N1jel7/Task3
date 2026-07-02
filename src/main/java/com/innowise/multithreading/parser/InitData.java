@@ -1,4 +1,4 @@
-package com.innowise.multithreading.config;
+package com.innowise.multithreading.parser;
 
 import com.innowise.multithreading.entity.CarSpecification;
 import com.innowise.multithreading.entity.PartType;

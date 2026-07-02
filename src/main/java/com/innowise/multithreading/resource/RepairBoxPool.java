@@ -40,8 +40,7 @@ public class RepairBoxPool {
     public void releaseBox(int boxId) {
         idLock.lock();
         try {
-            // push the id back before releasing the semaphore permit,
-            // otherwise a woken thread could pop from an empty deque
+            // push the id back before releasing the semaphore permit, otherwise a woken thread could pop from an empty deque
             freeBoxIds.push(boxId);
         } finally {
             idLock.unlock();

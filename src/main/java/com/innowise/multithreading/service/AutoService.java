@@ -12,4 +12,5 @@ public interface AutoService {
     Warehouse getWarehouse();
 
     int getRepairTimePerPartSeconds();
+
 }

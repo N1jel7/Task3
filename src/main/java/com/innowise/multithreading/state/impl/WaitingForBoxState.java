@@ -22,7 +22,7 @@ public class WaitingForBoxState implements CarState {
         car.markBoxAcquired();
         log.info("Car-{} occupied box #{}", car.getCarId(), boxId);
 
-        return new InRepairState();
+        return new InBoxState();
     }
 
     @Override

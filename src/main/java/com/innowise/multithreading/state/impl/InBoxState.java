@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-public class InRepairState implements CarState {
+public class InBoxState implements CarState {
 
-    private static final Logger log = LogManager.getLogger(InRepairState.class);
+    private static final Logger log = LogManager.getLogger(InBoxState.class);
 
     @Override
     public CarState handle(Car car) throws InterruptedException {

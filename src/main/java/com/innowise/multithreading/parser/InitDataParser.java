@@ -1,7 +1,9 @@
-package com.innowise.multithreading.config;
+package com.innowise.multithreading.parser;
 
 import com.innowise.multithreading.exception.CustomAutoException;
 
-public interface InitDataLoader {
-    InitData load(String path) throws CustomAutoException;
+public interface InitDataParser {
+
+    InitData parse(String path) throws CustomAutoException;
+
 }

@@ -5,6 +5,8 @@ import com.innowise.multithreading.state.impl.ArrivedState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 
@@ -18,9 +20,9 @@ public class Car implements Callable<RepairReport> {
     private CarState state;
     private int boxId;
 
-    private long arrivedAt;
-    private long boxAcquiredAt;
-    private long partsAcquiredAt;
+    private Instant arrivedAt;
+    private Instant boxAcquiredAt;
+    private Instant partsAcquiredAt;
 
     public Car(int carId, PartType requiredPart, int requiredAmount) {
         this.carId = carId;
@@ -37,17 +39,17 @@ public class Car implements Callable<RepairReport> {
             state = state.handle(this);
         }
 
-        long waitingForBoxMillis = boxAcquiredAt - arrivedAt;
-        long waitingForPartsMillis = partsAcquiredAt - boxAcquiredAt;
-        long totalMillis = System.currentTimeMillis() - arrivedAt;
+        Duration waitingForBox = Duration.between(arrivedAt, boxAcquiredAt);
+        Duration waitingForParts = Duration.between(boxAcquiredAt, partsAcquiredAt);
+        Duration total = Duration.between(arrivedAt, Instant.now());
 
         RepairReport report = new RepairReport(
                 carId,
                 requiredPart,
                 requiredAmount,
-                waitingForBoxMillis,
-                waitingForPartsMillis,
-                totalMillis
+                waitingForBox.toMillis(),
+                waitingForParts.toMillis(),
+                total.toMillis()
         );
 
         log.info("Car-{} finished processing, report: {}", carId, report);
@@ -55,15 +57,15 @@ public class Car implements Callable<RepairReport> {
     }
 
     public void markArrived() {
-        this.arrivedAt = System.currentTimeMillis();
+        this.arrivedAt = Instant.now();
     }
 
     public void markBoxAcquired() {
-        this.boxAcquiredAt = System.currentTimeMillis();
+        this.boxAcquiredAt = Instant.now();
     }
 
     public void markPartsAcquired() {
-        this.partsAcquiredAt = System.currentTimeMillis();
+        this.partsAcquiredAt = Instant.now();
     }
 
     public void setState(CarState state) {
