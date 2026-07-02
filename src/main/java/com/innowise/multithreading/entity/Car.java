@@ -9,13 +9,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Car implements Callable<RepairReport> {
+
     private static final Logger log = LogManager.getLogger(Car.class);
+    private static final AtomicInteger carIdGenerator = new AtomicInteger(1);
+    private static final AtomicInteger reportIdGenerator = new AtomicInteger(1);
 
     private final int carId;
-    private final PartType requiredPart;
-    private final int requiredAmount;
+    private final CarSpecification carSpecification;
 
     private CarState state;
     private int boxId;
@@ -24,19 +27,24 @@ public class Car implements Callable<RepairReport> {
     private Instant boxAcquiredAt;
     private Instant partsAcquiredAt;
 
-    public Car(int carId, PartType requiredPart, int requiredAmount) {
-        this.carId = carId;
-        this.requiredPart = requiredPart;
-        this.requiredAmount = requiredAmount;
+    public Car(CarSpecification carSpecification) {
+        this.carId = carIdGenerator.getAndIncrement();
+        this.carSpecification = carSpecification;
         this.state = new ArrivedState();
     }
 
     @Override
-    public RepairReport call() throws InterruptedException {
+    public RepairReport call() {
         log.info("Car-{} started processing", carId);
 
-        while (!state.isFinal()) {
-            state = state.handle(this);
+        try {
+            while (!state.isFinal()) {
+                state = state.handle(this);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Car-{} processing was interrupted", carId);
+            return null;
         }
 
         Duration waitingForBox = Duration.between(arrivedAt, boxAcquiredAt);
@@ -44,9 +52,9 @@ public class Car implements Callable<RepairReport> {
         Duration total = Duration.between(arrivedAt, Instant.now());
 
         RepairReport report = new RepairReport(
+                reportIdGenerator.getAndIncrement(),
                 carId,
-                requiredPart,
-                requiredAmount,
+                carSpecification,
                 waitingForBox.toMillis(),
                 waitingForParts.toMillis(),
                 total.toMillis()
@@ -77,11 +85,11 @@ public class Car implements Callable<RepairReport> {
     }
 
     public PartType getRequiredPart() {
-        return requiredPart;
+        return carSpecification.requiredPart();
     }
 
     public int getRequiredAmount() {
-        return requiredAmount;
+        return carSpecification.requiredAmount();
     }
 
     public int getBoxId() {
@@ -92,25 +100,43 @@ public class Car implements Callable<RepairReport> {
         this.boxId = boxId;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
 
-        Car car = (Car) object;
+    public boolean equalsById(Car car) {
+        if (car == null) return false;
+
         return carId == car.carId;
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Car car)) return false;
+
+        return carId == car.carId
+                && boxId == car.boxId
+                && (carSpecification == null ? car.carSpecification == null : carSpecification.equals(car.carSpecification))
+                && (state == null ? car.state == null : state.equals(car.state))
+                && (arrivedAt == null ? car.arrivedAt == null : arrivedAt.equals(car.arrivedAt))
+                && (boxAcquiredAt == null ? car.boxAcquiredAt == null : boxAcquiredAt.equals(car.boxAcquiredAt))
+                && (partsAcquiredAt == null ? car.partsAcquiredAt == null : partsAcquiredAt.equals(car.partsAcquiredAt));
+    }
+
+    @Override
     public int hashCode() {
-        return Integer.hashCode(carId);
+        int result = carId;
+        result = 31 * result + (carSpecification != null ? carSpecification.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + boxId;
+        result = 31 * result + (arrivedAt != null ? arrivedAt.hashCode() : 0);
+        result = 31 * result + (boxAcquiredAt != null ? boxAcquiredAt.hashCode() : 0);
+        result = 31 * result + (partsAcquiredAt != null ? partsAcquiredAt.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", Car.class.getSimpleName() + "[", "]")
                 .add("carId=" + carId)
-                .add("requiredPart=" + requiredPart)
-                .add("requiredAmount=" + requiredAmount)
+                .add("carSpecification=" + carSpecification)
                 .add("state=" + state)
                 .add("boxId=" + boxId)
                 .add("arrivedAt=" + arrivedAt)

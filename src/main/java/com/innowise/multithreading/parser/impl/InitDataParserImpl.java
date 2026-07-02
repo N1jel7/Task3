@@ -95,10 +95,9 @@ public class InitDataParserImpl implements InitDataParser {
 
                 if (currentSection == Section.CARS) {
                     String[] p = line.split(";");
-                    int carId = Integer.parseInt(p[0].trim());
-                    PartType partType = PartType.valueOf(p[1].trim());
-                    int amount = Integer.parseInt(p[2].trim());
-                    carSpecifications.add(new CarSpecification(carId, partType, amount));
+                    PartType partType = PartType.valueOf(p[0].trim());
+                    int amount = Integer.parseInt(p[1].trim());
+                    carSpecifications.add(new CarSpecification(partType, amount));
                 }
             } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
                 log.error("Failed to parse line: '{}'", line, e);

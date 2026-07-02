@@ -1,56 +1,47 @@
 package com.innowise.multithreading.app;
 
-import com.innowise.multithreading.entity.InitData;
-import com.innowise.multithreading.parser.InitDataParser;
-import com.innowise.multithreading.parser.impl.InitDataParserImpl;
 import com.innowise.multithreading.entity.Car;
 import com.innowise.multithreading.entity.CarSpecification;
+import com.innowise.multithreading.entity.InitData;
 import com.innowise.multithreading.entity.RepairReport;
 import com.innowise.multithreading.exception.CustomAutoException;
-import com.innowise.multithreading.resource.RepairBoxPool;
-import com.innowise.multithreading.resource.Warehouse;
-import com.innowise.multithreading.service.AutoService;
-import com.innowise.multithreading.service.impl.AutoServiceImpl;
-import com.innowise.multithreading.service.impl.SupplyTask;
+import com.innowise.multithreading.parser.InitDataParser;
+import com.innowise.multithreading.parser.impl.InitDataParserImpl;
+import com.innowise.multithreading.shop.CarRepairShop;
+import com.innowise.multithreading.shop.SupplyTask;
+import com.innowise.multithreading.util.StaticResources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Main {
 
     private static final Logger log = LogManager.getLogger(Main.class);
+    private static final String INPUT_FILE_PATH = "data/init_data.txt";
 
     void main(String[] args) {
         try {
             InitDataParser loader = new InitDataParserImpl();
-            InitData initData = loader.parse("data/init_data.txt");
+            InitData initData = loader.parse(INPUT_FILE_PATH);
+            StaticResources.setInitializationData(initData);
 
-            RepairBoxPool boxPool = new RepairBoxPool(initData.boxCount());
-            Warehouse warehouse = new Warehouse(initData.initialStock());
-
-            AutoService autoService = AutoServiceImpl.getInstance();
-            autoService.init(boxPool, warehouse, initData.repairTimePerPartSeconds());
+            CarRepairShop carRepairShop = CarRepairShop.getInstance();
 
             ScheduledExecutorService supplyExecutor = Executors.newSingleThreadScheduledExecutor();
-            SupplyTask supplyTask = new SupplyTask(warehouse, initData.restockAmounts());
+            SupplyTask supplyTask = new SupplyTask(carRepairShop.getWarehouse(), StaticResources.getRestockAmounts());
             supplyExecutor.scheduleAtFixedRate(
                     supplyTask,
-                    initData.restockPeriodSeconds(),
-                    initData.restockPeriodSeconds(),
+                    StaticResources.getRestockPeriodSeconds(),
+                    StaticResources.getRestockPeriodSeconds(),
                     TimeUnit.SECONDS
             );
 
             List<Car> cars = new ArrayList<>();
-            for (CarSpecification spec : initData.carSpecifications()) {
-                cars.add(new Car(spec.carId(), spec.requiredPart(), spec.requiredAmount()));
+            for (CarSpecification spec : StaticResources.getCarSpecifications()) {
+                cars.add(new Car(spec));
             }
 
             ExecutorService carExecutor = Executors.newFixedThreadPool(cars.size());

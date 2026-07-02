@@ -1,8 +1,7 @@
 package com.innowise.multithreading.state.impl;
 
 import com.innowise.multithreading.entity.Car;
-import com.innowise.multithreading.service.AutoService;
-import com.innowise.multithreading.service.impl.AutoServiceImpl;
+import com.innowise.multithreading.shop.CarRepairShop;
 import com.innowise.multithreading.state.CarState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +15,7 @@ public class InBoxState implements CarState {
     @Override
     public CarState handle(Car car) throws InterruptedException {
 
-        AutoService autoService = AutoServiceImpl.getInstance();
+        CarRepairShop autoService = CarRepairShop.getInstance();
 
         boolean partsTaken = autoService.getWarehouse()
                 .tryTakeParts(car.getRequiredPart(), car.getRequiredAmount());

@@ -1,4 +1,4 @@
-package com.innowise.multithreading.service.impl;
+package com.innowise.multithreading.shop;
 
 import com.innowise.multithreading.entity.PartType;
 import com.innowise.multithreading.resource.Warehouse;

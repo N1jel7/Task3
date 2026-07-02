@@ -1,9 +1,9 @@
 package com.innowise.multithreading.entity;
 
 public record RepairReport(
+        int reportId,
         int carId,
-        PartType partUsed,
-        int partAmount,
+        CarSpecification carSpecification,
         long waitingForBoxMillis,
         long waitingForPartsMillis,
         long totalMillis
