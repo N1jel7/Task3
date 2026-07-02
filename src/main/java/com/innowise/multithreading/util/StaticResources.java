@@ -18,7 +18,7 @@ public class StaticResources {
     private static InitData getInitializationData() {
         InitData data = initializationData.get();
         if (data == null) {
-            throw new IllegalStateException("InitData hasn't been set yet");
+            throw new IllegalStateException("Initialization data hasn't been set yet");
         }
         return data;
     }
@@ -57,7 +57,7 @@ public class StaticResources {
     public static void setInitializationData(InitData initData) {
         boolean wasSet = initializationData.compareAndSet(null, initData);
         if (!wasSet) {
-            throw new IllegalStateException("InitData has already been set");
+            throw new IllegalStateException("Initialization data has already been set");
         }
     }
 
