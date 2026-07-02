@@ -3,7 +3,7 @@ package com.innowise.multithreading.parser.impl;
 import com.innowise.multithreading.entity.CarSpecification;
 import com.innowise.multithreading.entity.PartType;
 import com.innowise.multithreading.exception.CustomAutoException;
-import com.innowise.multithreading.parser.InitData;
+import com.innowise.multithreading.entity.InitData;
 import com.innowise.multithreading.parser.InitDataParser;
 import com.innowise.multithreading.reader.CustomTextReader;
 import com.innowise.multithreading.reader.CustomTextReaderImpl;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class InitDataParserImpl implements InitDataParser {
 
@@ -57,7 +56,8 @@ public class InitDataParserImpl implements InitDataParser {
                     currentSection = Section.CARS;
                     continue;
                 }
-                default -> { /* Handling below (SECTION.NONE) */ }
+                default -> {
+                }
             }
 
             try {

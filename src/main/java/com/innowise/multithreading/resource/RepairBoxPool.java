@@ -30,7 +30,6 @@ public class RepairBoxPool {
         semaphore.acquire();
         idLock.lock();
         try {
-            // safe to pop: semaphore guarantees at least one free id is present
             return freeBoxIds.pop();
         } finally {
             idLock.unlock();
@@ -40,7 +39,6 @@ public class RepairBoxPool {
     public void releaseBox(int boxId) {
         idLock.lock();
         try {
-            // push the id back before releasing the semaphore permit, otherwise a woken thread could pop from an empty deque
             freeBoxIds.push(boxId);
         } finally {
             idLock.unlock();

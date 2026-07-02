@@ -10,7 +10,6 @@ public class AutoServiceImpl implements AutoService {
 
     private static final Logger log = LogManager.getLogger(AutoServiceImpl.class);
 
-    // Eager initialization
     private static final AutoService instance = new AutoServiceImpl();
 
     private RepairBoxPool boxPool;

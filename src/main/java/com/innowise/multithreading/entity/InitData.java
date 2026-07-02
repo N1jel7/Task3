@@ -1,7 +1,4 @@
-package com.innowise.multithreading.parser;
-
-import com.innowise.multithreading.entity.CarSpecification;
-import com.innowise.multithreading.entity.PartType;
+package com.innowise.multithreading.entity;
 
 import java.util.List;
 import java.util.Map;

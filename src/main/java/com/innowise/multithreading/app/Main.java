@@ -1,6 +1,6 @@
 package com.innowise.multithreading.app;
 
-import com.innowise.multithreading.parser.InitData;
+import com.innowise.multithreading.entity.InitData;
 import com.innowise.multithreading.parser.InitDataParser;
 import com.innowise.multithreading.parser.impl.InitDataParserImpl;
 import com.innowise.multithreading.entity.Car;
